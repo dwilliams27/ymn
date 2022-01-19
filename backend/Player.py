@@ -1,3 +1,6 @@
+from Card import CardGroup
 
 class Player:
-  cards = Card[0]
+  def __init__(self, playerIndex: int):
+    self.playerIndex = playerIndex
+    self.hand = CardGroup([])
