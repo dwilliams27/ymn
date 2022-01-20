@@ -1,30 +1,38 @@
 from abc import ABC, abstractmethod
 from enum import Enum;
+from colorama import Fore, Style
 
-from Player import Player
-from State import State
+from . import State
 
 class Action(ABC):
-  @property
-  @abstractmethod
-  def id(self):
-    pass
-
   @abstractmethod
   def transform(self, state: State) -> None:
     pass
 
 class DrawPile(Enum):
-  DECK = 0
-  DISCARD = 1
+  DECK = 'Deck'
+  DISCARD = 'Discard pile'
+
+class ActionList(Enum):
+  Pass = 'PassAction'
+  ChangeActivePlayer = 'ChangeActivePlayerAction'
+  DrawCard = 'DrawCardAction'
+  AskMayI = 'AskMayIAction'
+  ApproveMayIRequest = 'ApproveMayIRequestAction'
+  DenyMayIRequest = 'DenyMayIRequestAction'
+  RewardPlayerWithMayI = 'RewardPlayerWithMayIAction'
+
 
 class PassAction(Action):
-  def transform(self, state):
+  def __init__(self, player):
+    self.player = player
+
+  def transform(self, state: State):
+    print(f'{self.player.name} is passing...')
     pass
 
 class ChangeActivePlayerAction(Action):
   def __init__(self, newIndex: int):
-    super().__init__()
     self.newIndex = newIndex
 
   def transform(self, state: State):
@@ -32,9 +40,10 @@ class ChangeActivePlayerAction(Action):
     state.activePlayerIndex = self.newIndex
 
 class DrawCardAction(Action):
-  def __init__(self, playerIndex: int, pile: DrawPile):
+  def __init__(self, playerIndex: int, player: str, pile: DrawPile):
     self.playerIndex = playerIndex
     self.pile = pile
+    self.player = player
 
   def transform(self, state: State):
     if(self.pile == DrawPile.DECK):
@@ -44,28 +53,39 @@ class DrawCardAction(Action):
         print('Cannot draw from empty discard pile')
         raise
       state.players[self.playerIndex].hand.cards.append(state.discard.cards.pop(0))
+    print(f'{player.getPrintableName()} draws a card from the {Fore.MAGENTA}{self.pile.value}{Style.RESET_ALL}')
 
 class AskMayIAction(Action):
-  def __init__(self, player: Player):
+  player = None
+
+  def __init__(self, player):
     self.player = player
 
   def transform(self, state: State):
-    if(state.activeMayIRequest != None):
+    if(state.activeMayIRequester != None):
       print('Another player already has an active May I request')
       raise
-    state.activeMayIRequest = self.player
+    state.activeMayIRequester = self.player
 
 class ApproveMayIRequestAction(Action):
   def transform(self, state: State):
     pass
 
 class DenyMayIRequestAction(Action):
-  def __init__(self, player: Player):
+  def __init__(self, player):
     self.player = player
 
   def transform(self, state: State):
+    print()
     state.mayIRequestWinner = self.player
     state.activeMayIRequester = None
 
-class Actions(Enum):
-  PASS = PassAction
+class RewardPlayerWithMayIAction(Action):
+  def __init__(self, player):
+    self.player = player
+
+  def transform(self, state: State):
+    DrawCardAction(state.getIndexOfPlayer(self.player), self.player.name, DrawPile.DECK).transform(state)
+    DrawCardAction(state.getIndexOfPlayer(self.player), self.player.name, DrawPile.DISCARD).transform(state)
+    state.mayIRequestWinner = self.player
+    state.activeMayIRequester = None

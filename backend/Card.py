@@ -40,7 +40,7 @@ class CardGroup:
 		if(card.suit == Suit.HEARTS or card.suit == Suit.DIAMONDS):
 			return f'{Fore.RED}|{card.name} of {card.suit.name}|{Style.RESET_ALL}'
 		if(card.suit == None):
-			return f'{Fore.YELLOW}|{card.name} of NONE|{Style.RESET_ALL}'
+			return f'{Fore.GREEN}|{card.name} of NONE|{Style.RESET_ALL}'
 		return f'{Fore.BLUE}|{card.name} of {card.suit.name}|{Style.RESET_ALL}'
 
 class CardFactory:

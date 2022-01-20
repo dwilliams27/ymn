@@ -1,20 +1,15 @@
 
 from Card import CardGroup, CardFactory
-from Player import Player
 
 class State:
   def __init__(self, num_players: int):
-    self.players: [Player] = [None] * num_players
-    for i in range(num_players):
-      self.players[i] = Player(i)
+    self.players = [None] * num_players
     self.activePlayerIndex = 0
     self.activePlayer = self.players[0]
     self.activeMayIRequester = None
     self.mayIRequestWinner = None
     self.turn = 0
     self.round = 0
-
-    self.setup()
 
   def setup(self):
     # Deck setup
@@ -31,4 +26,11 @@ class State:
     if(round == 0):
       for i in range(len(self.players) * 10):
         self.players[i % len(self.players)].hand.cards.append(self.deck.cards.pop(0))
+
+  def getIndexOfPlayer(self, player):
+    i = 0
+    for p in self.players:
+      if(p.name == player.name):
+        return i
+      i += 1
   

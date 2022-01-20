@@ -26,13 +26,14 @@ fname_pre = [
   'Jim',
   'Bri',
   'Bon',
-  'Blip',
+  'Bli',
   'Glon',
   'Mip',
   'Shla',
   'Han',
   'Erm',
-  'Blat'
+  'Blat',
+  'Dav'
 ]
 
 fname_post = [
@@ -42,6 +43,7 @@ fname_post = [
   'mack',
   'dan',
   'is',
+  'id',
   'bert',
   'ackle',
   'toose',
@@ -63,10 +65,12 @@ lname_pre = [
   'Vit',
   'Man',
   'Flip',
-  'Auck'
+  'Auck',
+  'Ogl'
 ]
 
 lname_post = [
+  'iams',
   'ton',
   'son',
   'bourne',
@@ -78,7 +82,8 @@ lname_post = [
   'alty',
   'ustaus',
   'umber',
-  'atto'
+  'atto',
+  'ayashi'
 ]
 
 superlative = [
@@ -92,7 +97,6 @@ superlative = [
   'the Desperate',
   'the Triumphant',
   'the Elder',
-  'the Warrior',
   'the Younger',
   'the Traitor',
   'the Vile',
@@ -101,7 +105,10 @@ superlative = [
   'the Terrible',
   'the Diseased',
   'the Generous',
-  'the Unlucky'
+  'the Unlucky',
+  'the Cursed',
+  'the Prideful',
+  'the Greedy'
 ]
 
 class NameFactory:
@@ -109,7 +116,9 @@ class NameFactory:
   def generateName():
     fname1 = fname_pre[random.randrange(len(fname_pre))]
     fname2 = fname_post[random.randrange(len(fname_post))]
-    if(fname1[-1] in doublers and fname2[0] in vowels):
+    if(fname1[-1] == fname2[0]):
+      fname1 = fname1.rstrip(fname1[-1])
+    if(fname1[-1] in doublers and fname2[0] in vowels and fname1[-2] in vowels):
       fname1 += fname1[-1]
 
     name = fname1 + fname2 + \
