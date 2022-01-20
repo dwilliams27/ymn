@@ -1,7 +1,7 @@
+import random
+
 from enum import Enum;
 from colorama import Style, Fore
-
-from Logger import Logger
 
 class Suit(Enum):
 	HEARTS = 0
@@ -20,17 +20,17 @@ class CardGroup:
 		self.cards = cards
 
 	def printCards(self):
-		printStr = ""
+		printStr = ''
 		maxWidth = 4
 		counter = 0
 		for card in self.cards:
 			if(counter >= maxWidth):
 				counter = 0
 				print(printStr)
-				printStr = ""
+				printStr = ''
 			cardText = self.getCardInColor(card)
 			while(len(cardText) < 25):
-				cardText += " "
+				cardText += ' '
 			printStr += cardText
 			counter += 1
 		if(len(printStr) != 0):
@@ -38,10 +38,10 @@ class CardGroup:
 
 	def getCardInColor(self, card: Card):
 		if(card.suit == Suit.HEARTS or card.suit == Suit.DIAMONDS):
-			return f"{Fore.RED}|{card.name} of {card.suit.name}|{Style.RESET_ALL}"
+			return f'{Fore.RED}|{card.name} of {card.suit.name}|{Style.RESET_ALL}'
 		if(card.suit == None):
-			return f"{Fore.YELLOW}|{card.name} of NONE|{Style.RESET_ALL}"
-		return f"{Fore.BLUE}|{card.name} of {card.suit.name}|{Style.RESET_ALL}"
+			return f'{Fore.YELLOW}|{card.name} of NONE|{Style.RESET_ALL}'
+		return f'{Fore.BLUE}|{card.name} of {card.suit.name}|{Style.RESET_ALL}'
 
 class CardFactory:
 	@staticmethod
@@ -66,8 +66,8 @@ class CardFactory:
 			for suit in [Suit.HEARTS, Suit.DIAMONDS, Suit.SPADES, Suit.CLUBS]:
 				info = CardFactory.determineInfo(index)
 				deck.append(Card(info[0], info[1], suit))
-		deck.append(Card("*", range(13), None))
-		deck.append(Card("*", range(13), None))
+		deck.append(Card('*', range(13), None))
+		deck.append(Card('*', range(13), None))
 		return deck
 
 	@staticmethod
@@ -76,4 +76,8 @@ class CardFactory:
 		for _ in range(num_players // 2):
 			deck += CardFactory.constructDeck()
 		return deck
+
+	@staticmethod
+	def shuffleDeck(deck: [Card]):
+		random.shuffle(deck)
 

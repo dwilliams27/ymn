@@ -41,7 +41,7 @@ class DrawCardAction(Action):
       state.players[self.playerIndex].hand.cards.append(state.deck.cards.pop(0))
     if(self.pile == DrawPile.DISCARD):
       if(len(state.discard.cards) == 0):
-        print("Cannot draw from empty discard pile")
+        print('Cannot draw from empty discard pile')
         raise
       state.players[self.playerIndex].hand.cards.append(state.discard.cards.pop(0))
 
@@ -51,7 +51,7 @@ class AskMayIAction(Action):
 
   def transform(self, state: State):
     if(state.activeMayIRequest != None):
-      print("Another player already has an active May I request")
+      print('Another player already has an active May I request')
       raise
     state.activeMayIRequest = self.player
 
@@ -69,4 +69,3 @@ class DenyMayIRequestAction(Action):
 
 class Actions(Enum):
   PASS = PassAction
-  

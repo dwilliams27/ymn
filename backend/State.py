@@ -4,7 +4,7 @@ from Player import Player
 
 class State:
   def __init__(self, num_players: int):
-    self.players = [None] * num_players
+    self.players: [Player] = [None] * num_players
     for i in range(num_players):
       self.players[i] = Player(i)
     self.activePlayerIndex = 0
@@ -12,7 +12,23 @@ class State:
     self.activeMayIRequester = None
     self.mayIRequestWinner = None
     self.turn = 0
-    self.deck: CardGroup = CardGroup(CardFactory.generateDeckForGame(num_players))
+    self.round = 0
+
+    self.setup()
+
+  def setup(self):
+    # Deck setup
+    self.deck: CardGroup = CardGroup(CardFactory.generateDeckForGame(len(self.players)))
     self.discard: CardGroup = CardGroup([])
 
-    self.deck.printCards()
+    CardFactory.shuffleDeck(self.deck.cards)
+    self.dealCards(0)
+    for i in self.players:
+      print(i.name)
+      i.hand.printCards()
+
+  def dealCards(self, round: int):
+    if(round == 0):
+      for i in range(len(self.players) * 10):
+        self.players[i % len(self.players)].hand.cards.append(self.deck.cards.pop(0))
+  
