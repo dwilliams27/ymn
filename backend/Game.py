@@ -91,7 +91,6 @@ class Game:
 
       # Player must decide card to take
       if(canDraw):
-        print('candraw')
         activePlayer.makeDecision(AskDrawDecision(activePlayer, self.state), self.state)
 
       # Player is given chance to go down
