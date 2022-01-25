@@ -27,13 +27,17 @@ fname_pre = [
   'Bri',
   'Bon',
   'Bli',
+  'Bil',
   'Glon',
   'Mip',
   'Shla',
   'Han',
   'Erm',
   'Blat',
-  'Dav'
+  'Dav',
+  'Tun',
+  'Bol',
+  'Kal'
 ]
 
 fname_post = [
@@ -48,7 +52,8 @@ fname_post = [
   'ackle',
   'toose',
   'ible',
-  'lop'
+  'lop',
+  'gon'
 ]
 
 lname_pre = [

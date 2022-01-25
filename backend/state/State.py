@@ -17,6 +17,7 @@ class State:
     self.discard: CardGroup = CardGroup([])
 
     CardFactory.shuffleDeck(self.deck.cards)
+    self.discard.cards.append(self.deck.cards.pop(0))
     self.dealCards(0)
     for i in self.players:
       print(i.name)

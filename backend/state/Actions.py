@@ -2,9 +2,13 @@ from abc import ABC, abstractmethod
 from enum import Enum;
 from colorama import Fore, Style
 
+from Card import CardFactory
 from . import State
 
 class Action(ABC):
+  def __init__(self, player):
+    self.player = player
+
   @abstractmethod
   def transform(self, state: State) -> None:
     pass
@@ -16,7 +20,8 @@ class DrawPile(Enum):
 class ActionList(Enum):
   Pass = 'PassAction'
   ChangeActivePlayer = 'ChangeActivePlayerAction'
-  DrawCard = 'DrawCardAction'
+  DrawDeckCard = 'DrawDeckCardAction'
+  DrawDiscardCard = 'DrawDiscardCardAction'
   AskMayI = 'AskMayIAction'
   ApproveMayIRequest = 'ApproveMayIRequestAction'
   DenyMayIRequest = 'DenyMayIRequestAction'
@@ -24,11 +29,7 @@ class ActionList(Enum):
 
 
 class PassAction(Action):
-  def __init__(self, player):
-    self.player = player
-
   def transform(self, state: State):
-    print(f'{self.player.name} is passing...')
     pass
 
 class ChangeActivePlayerAction(Action):
@@ -39,28 +40,32 @@ class ChangeActivePlayerAction(Action):
     state.activePlayer = state.players[self.newIndex]
     state.activePlayerIndex = self.newIndex
 
-class DrawCardAction(Action):
-  def __init__(self, playerIndex: int, player: str, pile: DrawPile):
-    self.playerIndex = playerIndex
-    self.pile = pile
+class DrawDeckCardAction(Action):
+  def __init__(self, player):
+    self.playerIndex = player.playerIndex
     self.player = player
 
   def transform(self, state: State):
-    if(self.pile == DrawPile.DECK):
-      state.players[self.playerIndex].hand.cards.append(state.deck.cards.pop(0))
-    if(self.pile == DrawPile.DISCARD):
-      if(len(state.discard.cards) == 0):
-        print('Cannot draw from empty discard pile')
-        raise
-      state.players[self.playerIndex].hand.cards.append(state.discard.cards.pop(0))
-    print(f'{player.getPrintableName()} draws a card from the {Fore.MAGENTA}{self.pile.value}{Style.RESET_ALL}')
+    if(len(state.deck.cards) == 0):
+      state.deck.cards.append(state.discard.cards)
+      CardFactory.shuffleDeck(state.deck.cards)
+      state.discard.cards = []
+    state.players[self.playerIndex].hand.cards.append(state.deck.cards.pop(0))
+    print(f'{self.player.getPrintableName()} draws a card from the {Fore.MAGENTA}Deck{Style.RESET_ALL}')
 
-class AskMayIAction(Action):
-  player = None
-
+class DrawDiscardCardAction(Action):
   def __init__(self, player):
+    self.playerIndex = player.playerIndex
     self.player = player
 
+  def transform(self, state: State):
+    if(len(state.discard.cards) == 0):
+      print('Cannot draw from empty discard pile')
+      raise
+    state.players[self.playerIndex].hand.cards.append(state.discard.cards.pop(0))
+    print(f'{self.player.getPrintableName()} draws a card from the {Fore.MAGENTA}Discard pile{Style.RESET_ALL}')
+
+class AskMayIAction(Action):
   def transform(self, state: State):
     if(state.activeMayIRequester != None):
       print('Another player already has an active May I request')
@@ -72,20 +77,30 @@ class ApproveMayIRequestAction(Action):
     pass
 
 class DenyMayIRequestAction(Action):
-  def __init__(self, player):
-    self.player = player
-
   def transform(self, state: State):
-    print()
     state.mayIRequestWinner = self.player
     state.activeMayIRequester = None
 
 class RewardPlayerWithMayIAction(Action):
-  def __init__(self, player):
-    self.player = player
-
   def transform(self, state: State):
-    DrawCardAction(state.getIndexOfPlayer(self.player), self.player.name, DrawPile.DECK).transform(state)
-    DrawCardAction(state.getIndexOfPlayer(self.player), self.player.name, DrawPile.DISCARD).transform(state)
+    DrawDeckCardAction(self.player).transform(state)
+    DrawDiscardCardAction(self.player).transform(state)
+    self.player.mayIs += 1
     state.mayIRequestWinner = self.player
     state.activeMayIRequester = None
+
+class DiscardCardAction(Action):
+  def __init__(self, player):
+    self.playerIndex = player.playerIndex
+    self.player = player
+
+  def setCardIndex(self, cardIndex):
+    self.cardIndex = cardIndex
+
+  def transform(self, state: State):
+    state.discard.cards.insert(0, self.player.hand.cards.pop(self.cardIndex))
+
+class GoDownAction(Action):
+  def transform(self, state: State):
+    self.player.isDown = True
+    pass
